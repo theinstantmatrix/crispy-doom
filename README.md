@@ -1,3 +1,8 @@
+Crispy Doom (with unofficial binaries for Windows ARM64/AArch64, fork of [fabiangreffrath/crispy-doom](https://github.com/fabiangreffrath/crispy-doom)).  
+Downloads are hosted at the [releases](https://github.com/theinstantmatrix/crispy-doom/releases) section.
+
+---
+
 # Crispy Doom
 [![Crispy Doom Icon](https://github.com/fabiangreffrath/crispy-doom/blob/master/data/doom.png)](https://github.com/fabiangreffrath/crispy-doom)
 

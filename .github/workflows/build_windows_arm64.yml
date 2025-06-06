@@ -1,0 +1,93 @@
+name: Build Crispy Doom (Windows ARM64/AArch64)
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-winarm64:
+    defaults:
+      run:
+        shell: msys2 {0}
+    runs-on: windows-11-arm
+    steps:
+      - name: 'Configure git: core.autocrlf, core.eol'
+        shell: bash
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - uses: actions/checkout@v6
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: CLANGARM64
+          update: true
+          pacboy: >-
+            cmake:p
+            fluidsynth:p
+            libpng:p
+            libsamplerate:p
+            ninja:p
+            python-pillow:p
+            python-yaml:p
+            SDL2:p
+            SDL2_mixer:p
+            SDL2_net:p
+            toolchain:p
+      - name: Apply workarounds
+        run: |
+          # Unable to find fluidsynth libraries for versions 2.4.6 or newer.
+          # Due to the fix for https://github.com/FluidSynth/fluidsynth/issues/1543
+          ln -s $MSYSTEM_PREFIX/lib/libfluidsynth-3.a $MSYSTEM_PREFIX/lib/libfluidsynth.a
+          ln -s $MSYSTEM_PREFIX/lib/libfluidsynth-3.dll.a $MSYSTEM_PREFIX/lib/libfluidsynth.dll.a
+      - name: Build (Truecolor)
+        run: |
+          cmake -B build_truecolor -S . -DCRISPY_TRUECOLOR=ON
+          cmake --build build_truecolor
+      - name: Build
+        run: |
+          cmake -B build -S .
+          cmake --build build
+      - name: Copy files
+        run: |
+          cd build
+          for i in doom heretic hexen strife
+          do
+              mkdir upload_${i}
+              for j in doom heretic hexen strife
+              do
+                  for k in $(ldd src/crispy-${j}.exe | cut -d '>' -f 2 | grep $MSYSTEM_PREFIX/bin | awk '{print $1}')
+                  do
+                      [ -f "${k}" ] && cp -n "${k}" upload_${i}
+                  done
+              done
+              cp ../build_truecolor/src/crispy-${i}.exe upload_${i}/crispy-${i}-truecolor.exe
+              cp ../COPYING.md upload_${i}/copying.md
+              cp src/crispy-${i}.exe upload_${i}
+              cp src/crispy-setup.exe upload_${i}/crispy-${i}-setup.exe
+              strip upload_${i}/*.exe
+          done
+      - name: Upload as artifact (Crispy Doom)
+        uses: actions/upload-artifact@v6
+        with:
+          name: crispy-doom-git-winarm64-${{github.sha}}
+          path: build/upload_doom
+          if-no-files-found: error
+      - name: Upload as artifact (Crispy Heretic)
+        uses: actions/upload-artifact@v6
+        with:
+          name: crispy-heretic-git-winarm64-${{github.sha}}
+          path: build/upload_heretic
+          if-no-files-found: error
+      - name: Upload as artifact (Crispy Hexen)
+        uses: actions/upload-artifact@v6
+        with:
+          name: crispy-hexen-git-winarm64-${{github.sha}}
+          path: build/upload_hexen
+          if-no-files-found: error
+      - name: Upload as artifact (Crispy Strife)
+        uses: actions/upload-artifact@v6
+        with:
+          name: crispy-strife-git-winarm64-${{github.sha}}
+          path: build/upload_strife
+          if-no-files-found: error
