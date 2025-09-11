@@ -273,6 +273,7 @@ static registry_value_t root_path_keys[] =
 
 static char *root_path_subdirs[] =
 {
+    ".", // [crispy] moved to top, so reworked IWADs will be found before the legacy DOS ones
     "Doom2",
     "Final Doom",
     "Ultimate Doom",
@@ -281,7 +282,6 @@ static char *root_path_subdirs[] =
     "base\\wads",
     "dos\\base\\heretic",
     "dos\\base\\hexen",
-    ".",
 };
 
 // Location where Steam is installed
@@ -317,6 +317,9 @@ static char *steam_install_subdirs[] =
 
     // From Heretic + Hexen Rerelease:
 
+    "steamapps\\common\\Heretic + Hexen",
+    "steamapps\\common\\Heretic + Hexen\\base\\heretic",
+    "steamapps\\common\\Heretic + Hexen\\base\\hexen",
     "steamapps\\common\\Heretic + Hexen\\dos\\base\\heretic",
     "steamapps\\common\\Heretic + Hexen\\dos\\base\\hexen",
 
@@ -766,6 +769,9 @@ static void AddSteamDirs(void)
     AddIWADPath(steampath, "/Heretic Shadow of the Serpent Riders/base");
     AddIWADPath(steampath, "/Hexen/base");
     AddIWADPath(steampath, "/Hexen Deathkings of the Dark Citadel/base");
+    AddIWADPath(steampath, "/Heretic + Hexen");
+    AddIWADPath(steampath, "/Heretic + Hexen/base/heretic");
+    AddIWADPath(steampath, "/Heretic + Hexen/base/hexen");
     AddIWADPath(steampath, "/Heretic + Hexen/dos/base/heretic");
     AddIWADPath(steampath, "/Heretic + Hexen/dos/base/hexen");
     AddIWADPath(steampath, "/Strife");
